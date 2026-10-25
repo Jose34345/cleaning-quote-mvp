@@ -1,0 +1,20 @@
+import {describe,it,expect} from 'vitest';
+import {calculateQuote,QuoteError,validatePricingConfig} from '../src/lib/pricing/calculate-quote';
+import {DEMO_CONFIG} from '../src/lib/pricing/demo';
+const q={zip:'78701',service:'standard' as const,bedrooms:2,bathrooms:1,frequency:'once' as const,extras:[] as ('oven'|'fridge'|'windows')[]};
+describe('deterministic quote engine',()=>{
+ it('standard, integer cents and range',()=>{const r=calculateQuote(DEMO_CONFIG,q);expect(r.centerCents).toBe(15000);expect(r.minCents).toBe(13500);expect(r.maxCents).toBe(16500)});
+ it('deep and move cleaning',()=>{expect(calculateQuote(DEMO_CONFIG,{...q,service:'deep'}).centerCents).toBe(22000);expect(calculateQuote(DEMO_CONFIG,{...q,service:'move'}).centerCents).toBe(26000)});
+ it('multiple extras',()=>expect(calculateQuote(DEMO_CONFIG,{...q,extras:['oven','fridge']}).centerCents).toBe(19500));
+ it('frequency multiplier',()=>expect(calculateQuote(DEMO_CONFIG,{...q,frequency:'weekly'}).centerCents).toBe(12750));
+ it('minimum',()=>expect(calculateQuote({...DEMO_CONFIG,minimumCents:20000},q).centerCents).toBe(20000));
+ it('maximum',()=>expect(calculateQuote({...DEMO_CONFIG,maximumCents:12000},q).centerCents).toBe(12000));
+ it('unsupported ZIP',()=>expect(()=>calculateQuote({...DEMO_CONFIG,allowedZips:['90210']},q)).toThrow(QuoteError));
+ it('bad property',()=>expect(()=>calculateQuote(DEMO_CONFIG,{...q,bedrooms:13})).toThrow(QuoteError));
+ it('disabled service',()=>expect(()=>calculateQuote({...DEMO_CONFIG,serviceBaseCents:{standard:9000}}, {...q,service:'move'})).toThrow(QuoteError));
+ it('disabled extra',()=>expect(()=>calculateQuote({...DEMO_CONFIG,extrasCents:{}},{...q,extras:['oven']})).toThrow(QuoteError));
+ it('duplicate extras',()=>expect(()=>calculateQuote(DEMO_CONFIG,{...q,extras:['oven','oven']})).toThrow(QuoteError));
+ it('rounding to whole cent',()=>{const c={...DEMO_CONFIG,bedroomCents:0,bathroomCents:0,minimumCents:0,rangePercent:0,serviceBaseCents:{standard:111},frequencyPermille:{once:1000,weekly:855,biweekly:900,monthly:950}};expect(calculateQuote(c,{...q,frequency:'weekly'}).centerCents).toBe(95)});
+ it('invalid business config fails closed',()=>expect(()=>validatePricingConfig({...DEMO_CONFIG,rangePercent:-1})).toThrow());
+ it('estimate determined by server-owned config',()=>expect(calculateQuote({...DEMO_CONFIG,serviceBaseCents:{standard:23000}},q).centerCents).toBe(29000));
+});

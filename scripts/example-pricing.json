@@ -1,0 +1,9 @@
+{
+  "currency":"USD",
+  "serviceBaseCents":{"standard":9000,"deep":16000,"move":20000},
+  "bedroomCents":1800,"bathroomCents":2400,
+  "extrasCents":{"oven":2500,"fridge":2000,"windows":3000},
+  "frequencyPermille":{"once":1000,"weekly":850,"biweekly":900,"monthly":950},
+  "minimumCents":10000,"rangePercent":10,"allowedZips":["78701","78702","78703"],
+  "disclaimer":"Example only. Prices and service availability must be confirmed by the cleaning business."
+}

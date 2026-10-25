@@ -1,0 +1,3 @@
+import {client} from './_common';
+async function main(){const db=client();const from=new Date(Date.now()-30*86400000).toISOString();const {data,error}=await db.from('product_events').select('event_name,is_demo,source').gte('created_at',from);if(error)throw Error(error.message);const counts:Record<string,number>={};for(const e of data||[]){const key=`${e.event_name} | ${e.is_demo?'demo':'non-demo'} | ${e.source}`;counts[key]=(counts[key]||0)+1;}console.log('Last 30d raw event counts (public events may include crawlers, bots and tests):',counts)}
+main().catch(e=>{console.error(e.message);process.exit(1)});

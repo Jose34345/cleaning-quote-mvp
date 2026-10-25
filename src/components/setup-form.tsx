@@ -1,0 +1,11 @@
+'use client';
+import {FormEvent,useState} from 'react';
+export function SetupForm(){
+ const [form,setForm]=useState({owner:'',email:'',business:'',website:'',message:'',website2:''});
+ const [id]=useState(()=>crypto.randomUUID());const [busy,setBusy]=useState(false),[ok,setOk]=useState(false),[error,setError]=useState('');
+ async function submit(e:FormEvent){e.preventDefault();setBusy(true);setError('');try{
+  const resp=await fetch('/api/setup-requests',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...form,submissionId:id})});
+  const data=await resp.json();if(!resp.ok)throw new Error(data.error||'Unable to send request.');setOk(true);
+ }catch(e){setError(e instanceof Error?e.message:'Unable to send request.');}finally{setBusy(false);}}
+ return <form className="setup-form" onSubmit={submit}>{ok?<div role="status"><h2>Request received.</h2><p>Thanks for your interest. We'll review your information and reach out about setup. No payment was collected.</p></div>:<><label className="field">Your name<input required minLength={2} maxLength={100} autoComplete="name" value={form.owner} onChange={e=>setForm({...form,owner:e.target.value})}/></label><label className="field">Work email<input type="email" required value={form.email} onChange={e=>setForm({...form,email:e.target.value})}/></label><label className="field">Cleaning business name<input required minLength={2} maxLength={120} value={form.business} onChange={e=>setForm({...form,business:e.target.value})}/></label><label className="field">Website (optional)<input type="url" placeholder="https://" value={form.website} onChange={e=>setForm({...form,website:e.target.value})}/></label><label className="field">Anything we should know? (optional)<textarea rows={3} maxLength={1000} value={form.message} onChange={e=>setForm({...form,message:e.target.value})}/></label><label className="honeypot">Leave this blank<input tabIndex={-1} autoComplete="off" value={form.website2} onChange={e=>setForm({...form,website2:e.target.value})}/></label><p className="disclaimer">We'll use your details only to respond to your setup request. No marketing subscription or payment required.</p>{error&&<p role="alert" className="error">{error}</p>}<button className="btn primary wide" type="submit" disabled={busy}>{busy?'Submitting...':'Request Setup →'}</button></>}</form>
+}

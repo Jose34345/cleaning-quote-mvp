@@ -1,0 +1,41 @@
+{
+  "name": "cleaning-quote-mvp",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "check": "npm run typecheck && npm run test && npm run build",
+    "business:create": "tsx scripts/create-business.ts",
+    "business:pricing": "tsx scripts/update-pricing.ts",
+    "business:preview": "tsx scripts/create-preview.ts",
+    "business:activate": "tsx scripts/activate-business.ts",
+    "notifications:retry": "tsx scripts/retry-notifications.ts",
+    "retention:cleanup": "tsx scripts/delete-expired-leads.ts",
+    "metrics": "tsx scripts/metrics.ts"
+  },
+  "dependencies": {
+    "next": "^16.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "zod": "^4.0.0",
+    "@supabase/supabase-js": "^2.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.0",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "vitest": "^3.2.0",
+    "tailwindcss": "^4.1.0",
+    "@tailwindcss/postcss": "^4.1.0",
+    "postcss": "^8.4.0",
+    "tsx": "^4.20.0"
+  },
+  "engines": {
+    "node": ">=20.9"
+  }
+}
