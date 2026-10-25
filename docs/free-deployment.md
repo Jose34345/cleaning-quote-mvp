@@ -12,7 +12,7 @@
 
 ## Deployment sequence (manual account connection required)
 
-1. Run GitHub Actions CI: `node --test tests/repository-smoke.test.mjs`, `npm install`, `npm run typecheck`, `npm test`, `npm run build`. The optional **database integration suite is skipped** when isolated `TEST_DB_*` credentials are absent; a green normal CI **does not verify multi-tenant PostgreSQL isolation**.
+1. Run GitHub Actions CI: `node --test tests/repository-smoke.smoke.mjs`, `npm install`, `npm run typecheck`, `npm test`, `npm run build`. The optional **database integration suite is skipped** when isolated `TEST_DB_*` credentials are absent; a green normal CI **does not verify multi-tenant PostgreSQL isolation**.
 2. Register/sign into Netlify Free, **do not enable paid features**, import GitHub `Jose34345/cleaning-quote-mvp`, branch `main`, with framework autodetection. Build command `npm run build`; site framework publish output is `.next`. Use Netlify's automatically created `*.netlify.app` URL. The application must run as SSR; **do not use `next export`** because this app has server routes.
 3. Separately create a **new Supabase Free project** (not the Litoral Trace project), review quota and project ownership, and run migrations 001 then 002. Verify grants and RLS. Do not share existing production DB or service-role keys.
 4. In Netlify environment variables set server-only `SUPABASE_URL`, `SUPABASE_SECRET_KEY`, and a random 32+ character `ABUSE_HASH_SECRET`. Leave `BILLING_LIVE_ENABLED=false`. Set `NEXT_PUBLIC_SITE_URL` to the issued Netlify URL (then redeploy to inject public vars into the client bundle).

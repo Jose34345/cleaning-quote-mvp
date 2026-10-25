@@ -15,7 +15,7 @@ jobs:
           node-version: '22'
       # Dependency-free source and safety smoke checks run even if npm is unavailable.
       - name: Repository smoke checks
-        run: node --test tests/repository-smoke.test.mjs
+        run: node --test tests/repository-smoke.smoke.mjs
       # No lockfile exists yet; npm install rather than npm ci is intentional.
       - name: Install dependencies
         run: npm install --no-audit --no-fund
