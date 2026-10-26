@@ -32,7 +32,13 @@ test('billing defaults to disabled and public variables exclude database secrets
 
 test('quote prices are recalculated server-side and demo never creates leads', () => {
   assert.match(read('src/app/api/quotes/route.ts'), /calculateQuote\(business\.pricing_config,input\)/);
-  assert.match(read('src/components/quote-form.tsx'), /if\(demo\)\{setSuccess\(true\);return;\}/);
+  const form = read('src/components/quote-form.tsx');
+  const decision = read('src/lib/quote-submission.ts');
+  assert.match(form, /resolveQuoteSubmissionAction\(demo,lead\.consent\)/);
+  assert.match(form, /if\(action==='complete-demo'\)\{setError\(''\);setSuccess\(true\);return;\}/);
+  assert.match(form, /if\(action==='require-consent'\)\{setError\(/);
+  assert.match(decision, /if \(demo\) return 'complete-demo'/);
+  assert.match(decision, /return consent \? 'submit-lead' : 'require-consent'/);
 });
 
 test('privileged tenant tables are not readable using browser roles', () => {
