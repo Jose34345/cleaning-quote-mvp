@@ -2,6 +2,7 @@
 import {useState,type FormEvent} from 'react';
 import { calculateQuote,USD,QuoteError,type QuoteInput,type PricingConfig,type Service,type Frequency,type Extra } from '@/lib/pricing/calculate-quote';
 import {DEMO_CONFIG} from '@/lib/pricing/demo';
+import {resolveQuoteSubmissionAction} from '@/lib/quote-submission';
 
 const SERVICES: Record<Service,string>={standard:'Standard Cleaning',deep:'Deep Cleaning',move:'Move-In / Move-Out'};
 const FREQ:Record<Frequency,string>={once:'One-Time',weekly:'Weekly',biweekly:'Every Two Weeks',monthly:'Monthly'};
@@ -36,8 +37,10 @@ export function QuoteForm({slug,businessName,demo=false,demoConfig=DEMO_CONFIG,s
     setStep(a=>Math.min(a+1,6));
   }
   async function submit(e:FormEvent){
-    e.preventDefault(); if(!lead.consent){setError('Please confirm your information can be shared with this cleaning company.');return;}
-    if(demo){setSuccess(true);return;}
+    e.preventDefault();
+    const action=resolveQuoteSubmissionAction(demo,lead.consent);
+    if(action==='complete-demo'){setError('');setSuccess(true);return;}
+    if(action==='require-consent'){setError('Please confirm your information can be shared with this cleaning company.');return;}
     setBusy(true);setError('');
     try{
       const res=await fetch('/api/quotes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({slug,...form,submissionId,...lead,consent:true,website:''})});
